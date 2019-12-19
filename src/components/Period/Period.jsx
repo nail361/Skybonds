@@ -1,13 +1,28 @@
-import React from './node_modules/react';
+import React from 'react';
+import './Period.css';
+
+const buttons = [
+  {period: 'week', title: 'Week'},
+  {period: 'month', title: 'Month'},
+  {period: 'quarter', title: 'Quarter'},
+  {period: 'year', title: 'Year'},
+  {period: 'max', title: 'Max'},
+];
 
 const Period = (props) => {
   return (
-    <div>
-      <button type="button" onClick={()=>props.click("week")}>Week</button>
-      <button type="button" onClick={()=>props.click("month")} >Month</button>
-      <button type="button" onClick={()=>props.click("quarter")}>Quarter</button>
-      <button type="button" onClick={()=>props.click("year")}>Year</button>
-      <button type="button" onClick={()=>props.click("max")}>Max</button>
+    <div className="period">
+      { buttons.map( (button) =>
+          <button
+            key={button.period}
+            type="button"
+            onClick={()=>props.click(button.period)}
+            className={`button ${button.period === props.period ? "selected" : ""}`}
+          >
+            {button.title}
+          </button>
+        )
+      }
     </div>
   )
 }

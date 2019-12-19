@@ -1,12 +1,18 @@
-import React from './node_modules/react';
+import React from 'react';
 
 const Params = (props) => {
   return (
-    <select onChange={props.change} name="param" value={props.selected}>
-      <option value="yield">Yield</option>
-      <option value="spread">Spread</option>
-      <option value="price">Price</option>
-    </select>
+    <div style={{textAlign:"end"}}>
+      <select
+        onChange={(event)=>props.change(event.currentTarget.value)}
+        name="param"
+        value={props.selected}
+      >
+        <option value="yield">Yield</option>
+        <option value="spread">Spread</option>
+        <option value="price">Price</option>
+      </select>
+    </div>
   )
 }
 

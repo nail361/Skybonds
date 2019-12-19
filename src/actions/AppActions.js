@@ -1,23 +1,29 @@
 import * as types from './ActionTypes';
 
-export function getData(period, param) {
+export function setData(data) {
   return {
-    type: types.GET_DATA,
-    period,
-    param,
+    type: types.SET_DATA,
+    data
   };
 }
 
 export function changePeriod(period) {
-  return {
-    type: types.CHANGE_PERIOD,
-    period,
+  return (dispatch) => {
+    return new Promise((resolve) => {
+      dispatch(
+        {
+          type: types.CHANGE_PERIOD,
+          period,
+        },
+      );
+      resolve();
+    });
   };
 }
 
 export function changeParam(param) {
   return {
     type: types.CHANGE_PARAM,
-    period,
+    param,
   };
 }

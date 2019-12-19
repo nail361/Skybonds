@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import * as actions from '../actions/AppActions';
+import { connect } from 'react-redux';
+import * as actions from './actions/AppActions';
 import Graph from './components/Graph/Graph';
 import Period from './components/Period/Period';
 import Params from './components/Params/Params';
+import Loader from './components/Loader/Loader';
+import { recieveData } from './utils/API';
 import './App.css';
 
 const mapStateToProps = (state) => {
@@ -12,52 +15,49 @@ const mapStateToProps = (state) => {
 
 class App extends Component {
   state = {
-    data: [],
+    isLoading: true,
   }
 
   componentDidMount() {
-    this.setState({data: [
-      {
-        name: '01.10', yield: 4000, price: 2400, spread: 2400,
-      },
-      {
-        name: '02.10', yield: 3000, price: 1398, spread: 2210,
-      },
-      {
-        name: '03.10', yield: 2000, price: 9800, spread: 2290,
-      },
-      {
-        name: '04.10', yield: 2780, price: 3908, spread: 2000,
-      },
-      {
-        name: '05.10', yield: 1890, price: 4800, spread: 2181,
-      },
-      {
-        name: '06.10', yield: 2390, price: 3800, spread: 2500,
-      },
-      {
-        name: '07.10', yield: 3490, price: 4300, spread: 2100,
-      },
-    ]
+    this.getData();
+  }
+
+  getData() {
+    const { period } = this.props;
+    recieveData(period).then((response) =>{      
+      if (response.status === 'ok') {
+        const { setData } = this.props;
+        setData(response.data);
+        this.setState({isLoading: false});
+      }
+    }).catch((error)=>{
+      this.setState({isLoading: false});
     });
   }
 
-  onChangePeriod(period) {
-    console.log(period);
+  onChangePeriod(newPeriod) {
+    const { changePeriod, period } = this.props;
+
+    if (newPeriod === period) return;
+
+    this.setState({isLoading: true});    
+    changePeriod(newPeriod).then(() => this.getData());
   }
 
-  onChangeParam(event){
-    console.log(event.currentTarget.value);
+  onChangeParam(param){
+    const { changeParam } = this.props;
+    changeParam(param);
   }
 
-  render() {
-    const { period, param } = this.props;
-
+  render() {    
+    const { data, period, param } = this.props;
+    const { isLoading } = this.state;
     return (
-      <div>
-        <Period click={this.onChangePeriod} period={period}/>
-        <Graph data={this.state.data}/>
-        <Params change={this.onChangeParam} selected={param}/>
+      <div className="app">
+        {isLoading && <Loader />}
+        <Period click={this.onChangePeriod.bind(this)} period={period}/>
+        <Graph data={data} param={param}/>
+        <Params change={this.onChangeParam.bind(this)} selected={param}/>
       </div>
     )
   }
@@ -67,3 +67,9 @@ export default connect(
   mapStateToProps,
   actions,
 )(App);
+
+App.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  period: PropTypes.string.isRequired,
+  param: PropTypes.string.isRequired,
+}
